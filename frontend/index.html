@@ -1,0 +1,2023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>RainGuard AI | Heavy Rainfall & Inundation Intelligence</title>
+
+    <meta
+        name="description"
+        content="AI-powered heavy rainfall early warning and inundation prediction system."
+    >
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f4f7fb;
+            --surface: #ffffff;
+            --surface-2: #f8fafc;
+            --text: #172033;
+            --muted: #697586;
+            --border: #e5eaf1;
+
+            --primary: #1769ff;
+            --primary-dark: #0d4fd3;
+            --cyan: #0ea5e9;
+            --green: #16a34a;
+            --yellow: #eab308;
+            --orange: #f97316;
+            --red: #dc2626;
+
+            --shadow: 0 8px 30px rgba(15, 23, 42, 0.07);
+            --radius: 16px;
+        }
+
+        body {
+            font-family:
+                Inter,
+                ui-sans-serif,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        /* =========================
+           APP LAYOUT
+        ========================== */
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================== */
+
+        .sidebar {
+            width: 255px;
+            background: #0f172a;
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transition: 0.25s ease;
+        }
+
+        .brand {
+            height: 76px;
+            display: flex;
+            align-items: center;
+            padding: 0 22px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #1769ff, #06b6d4);
+            font-size: 20px;
+        }
+
+        .brand h1 {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .brand span {
+            display: block;
+            font-size: 10px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .nav {
+            padding: 20px 12px;
+            flex: 1;
+        }
+
+        .nav-label {
+            color: #64748b;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 1px;
+            font-weight: 700;
+            padding: 0 12px 10px;
+        }
+
+        .nav-item {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 4px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: #cbd5e1;
+            text-align: left;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(37, 99, 235, 0.18);
+            color: white;
+        }
+
+        .nav-icon {
+            width: 22px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .sidebar-bottom {
+            padding: 15px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .system-status {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #22c55e;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        /* =========================
+           MAIN
+        ========================== */
+
+        .main {
+            margin-left: 255px;
+            width: calc(100% - 255px);
+        }
+
+        /* =========================
+           HEADER
+        ========================== */
+
+        .header {
+            height: 76px;
+            background: rgba(255,255,255,0.94);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 900;
+        }
+
+        .mobile-menu {
+            display: none;
+            border: none;
+            background: none;
+            font-size: 23px;
+        }
+
+        .location {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .location-icon {
+            width: 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            background: #eff6ff;
+            color: var(--primary);
+            border-radius: 10px;
+        }
+
+        .location small {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .location strong {
+            font-size: 13px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: white;
+            display: grid;
+            place-items: center;
+        }
+
+        .user {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding-left: 8px;
+        }
+
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            color: white;
+            display: grid;
+            place-items: center;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .user strong {
+            font-size: 12px;
+        }
+
+        .user small {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        /* =========================
+           CONTENT
+        ========================== */
+
+        .content {
+            padding: 28px;
+            max-width: 1700px;
+            margin: auto;
+        }
+
+        .welcome {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 25px;
+        }
+
+        .welcome h2 {
+            font-size: 25px;
+            letter-spacing: -0.6px;
+        }
+
+        .welcome p {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .demo-badge {
+            background: #fff7ed;
+            color: #c2410c;
+            border: 1px solid #fed7aa;
+            padding: 7px 11px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        /* =========================
+           METRICS
+        ========================== */
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .metric {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            box-shadow: var(--shadow);
+        }
+
+        .metric-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .metric-label {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .metric-icon {
+            width: 35px;
+            height: 35px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            background: #eff6ff;
+        }
+
+        .metric-value {
+            font-size: 26px;
+            font-weight: 750;
+            margin-top: 13px;
+            letter-spacing: -1px;
+        }
+
+        .metric-footer {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .up {
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        .warning {
+            color: var(--orange);
+            font-weight: 700;
+        }
+
+        /* =========================
+           INTELLIGENCE CARDS
+        ========================== */
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 25px 0 13px;
+        }
+
+        .section-title h3 {
+            font-size: 15px;
+        }
+
+        .section-title span {
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .intelligence-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .intel-card {
+            color: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            min-height: 185px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .intel-card.rainfall {
+            background: linear-gradient(135deg, #155eef, #0ea5e9);
+        }
+
+        .intel-card.inundation {
+            background: linear-gradient(135deg, #075985, #0891b2);
+        }
+
+        .intel-card.decision {
+            background: linear-gradient(135deg, #3730a3, #6366f1);
+        }
+
+        .intel-card::after {
+            content: "";
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            right: -60px;
+            top: -60px;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .intel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .intel-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.16);
+            display: grid;
+            place-items: center;
+            font-size: 19px;
+        }
+
+        .intel-status {
+            background: rgba(255,255,255,0.14);
+            padding: 5px 8px;
+            border-radius: 15px;
+            font-size: 9px;
+        }
+
+        .intel-card h4 {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        .intel-card p {
+            color: rgba(255,255,255,0.78);
+            font-size: 11px;
+            line-height: 1.6;
+            margin-top: 5px;
+        }
+
+        .intel-score {
+            margin-top: 14px;
+            font-size: 11px;
+        }
+
+        .progress {
+            height: 5px;
+            background: rgba(255,255,255,0.18);
+            border-radius: 10px;
+            margin-top: 7px;
+            overflow: hidden;
+        }
+
+        .progress span {
+            display: block;
+            height: 100%;
+            background: white;
+            border-radius: inherit;
+        }
+
+        /* =========================
+           DASHBOARD GRID
+        ========================== */
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.45fr 0.85fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h3 {
+            font-size: 13px;
+        }
+
+        .panel-header span {
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        /* =========================
+           MAP
+        ========================== */
+
+        .map {
+            height: 390px;
+            position: relative;
+            background:
+                linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.75)),
+                repeating-linear-gradient(
+                    45deg,
+                    #dbeafe,
+                    #dbeafe 12px,
+                    #e0f2fe 12px,
+                    #e0f2fe 24px
+                );
+            overflow: hidden;
+        }
+
+        .map-river {
+            position: absolute;
+            width: 70%;
+            height: 45px;
+            background: rgba(14,165,233,0.35);
+            transform: rotate(-17deg);
+            top: 45%;
+            left: 15%;
+            border-radius: 50%;
+        }
+
+        .risk-zone {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(220,38,38,0.15);
+            border: 1px dashed rgba(220,38,38,0.55);
+        }
+
+        .risk-one {
+            width: 170px;
+            height: 120px;
+            left: 25%;
+            top: 30%;
+        }
+
+        .risk-two {
+            width: 120px;
+            height: 100px;
+            right: 15%;
+            bottom: 15%;
+        }
+
+        .map-marker {
+            position: absolute;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: var(--red);
+            border: 3px solid white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+        }
+
+        .marker-one {
+            left: 35%;
+            top: 40%;
+        }
+
+        .marker-two {
+            right: 25%;
+            bottom: 27%;
+        }
+
+        .map-label {
+            position: absolute;
+            font-size: 9px;
+            color: #334155;
+            background: rgba(255,255,255,0.85);
+            padding: 4px 7px;
+            border-radius: 5px;
+        }
+
+        .label-one {
+            left: 29%;
+            top: 33%;
+        }
+
+        .label-two {
+            right: 18%;
+            bottom: 22%;
+        }
+
+        .map-overlay {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255,255,255,0.94);
+            border-radius: 10px;
+            padding: 9px 11px;
+            font-size: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .map-controls {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .map-controls button {
+            width: 32px;
+            height: 32px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        /* =========================
+           ALERTS
+        ========================== */
+
+        .alerts {
+            padding: 5px 18px 14px;
+        }
+
+        .alert {
+            display: flex;
+            gap: 11px;
+            padding: 13px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .alert:last-child {
+            border-bottom: none;
+        }
+
+        .alert-icon {
+            width: 31px;
+            height: 31px;
+            flex: 0 0 31px;
+            border-radius: 9px;
+            display: grid;
+            place-items: center;
+        }
+
+        .alert.high .alert-icon {
+            background: #fee2e2;
+            color: var(--red);
+        }
+
+        .alert.medium .alert-icon {
+            background: #ffedd5;
+            color: var(--orange);
+        }
+
+        .alert.info .alert-icon {
+            background: #dbeafe;
+            color: var(--primary);
+        }
+
+        .alert strong {
+            font-size: 11px;
+            display: block;
+        }
+
+        .alert p {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 3px;
+            line-height: 1.4;
+        }
+
+        .alert time {
+            display: block;
+            font-size: 8px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        /* =========================
+           LOWER GRID
+        ========================== */
+
+        .lower-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        /* =========================
+           SAFE ROUTE
+        ========================== */
+
+        .route {
+            padding: 18px;
+        }
+
+        .route-score {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .safe-score {
+            font-size: 31px;
+            font-weight: 800;
+            color: var(--green);
+        }
+
+        .safe-label {
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        .route-line {
+            position: relative;
+            height: 75px;
+            margin: 15px 0;
+        }
+
+        .route-line::before {
+            content: "";
+            position: absolute;
+            top: 35px;
+            left: 15px;
+            right: 15px;
+            height: 5px;
+            background: #bbf7d0;
+            border-radius: 10px;
+        }
+
+        .route-point {
+            position: absolute;
+            top: 25px;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            color: white;
+            font-size: 9px;
+            font-weight: bold;
+        }
+
+        .start {
+            left: 5px;
+            background: var(--primary);
+        }
+
+        .mid {
+            left: 48%;
+            background: var(--green);
+        }
+
+        .end {
+            right: 5px;
+            background: #334155;
+        }
+
+        .route-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .route-stat {
+            background: var(--surface-2);
+            padding: 10px;
+            border-radius: 9px;
+            text-align: center;
+        }
+
+        .route-stat strong {
+            display: block;
+            font-size: 13px;
+        }
+
+        .route-stat span {
+            color: var(--muted);
+            font-size: 8px;
+        }
+
+        .route-button {
+            width: 100%;
+            margin-top: 13px;
+            padding: 10px;
+            border: none;
+            border-radius: 9px;
+            background: var(--primary);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* =========================
+           EMERGENCY
+        ========================== */
+
+        .emergency {
+            padding: 18px;
+        }
+
+        .emergency-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 9px;
+        }
+
+        .emergency-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .emergency-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            display: grid;
+            place-items: center;
+            background: #fee2e2;
+            color: var(--red);
+        }
+
+        .emergency-card strong {
+            display: block;
+            font-size: 11px;
+        }
+
+        .emergency-card span {
+            display: block;
+            color: var(--muted);
+            font-size: 9px;
+            margin-top: 2px;
+        }
+
+        .call-button {
+            border: none;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 7px 9px;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        /* =========================
+           FEATURE MODULES
+        ========================== */
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .feature {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            transition: 0.2s;
+        }
+
+        .feature:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .feature-icon {
+            font-size: 17px;
+            margin-bottom: 9px;
+        }
+
+        .feature strong {
+            font-size: 10px;
+            display: block;
+        }
+
+        .feature span {
+            color: var(--muted);
+            font-size: 8px;
+            line-height: 1.4;
+            display: block;
+            margin-top: 4px;
+        }
+
+        /* =========================
+           FOOTER
+        ========================== */
+
+        .footer {
+            text-align: center;
+            padding: 25px 0 10px;
+            color: #94a3b8;
+            font-size: 9px;
+        }
+
+        /* =========================
+           MOBILE
+        ========================== */
+
+        @media (max-width: 1100px) {
+            .metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .intelligence-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
+            .header {
+                padding: 0 15px;
+            }
+
+            .user-info {
+                display: none;
+            }
+
+            .content {
+                padding: 18px 14px;
+            }
+
+            .welcome {
+                align-items: flex-start;
+                gap: 10px;
+                flex-direction: column;
+            }
+
+            .metrics {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .lower-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 450px) {
+            .metrics {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .location-text {
+                display: none;
+            }
+
+            .header-actions {
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">🌧️</div>
+
+            <div>
+                <h1>RainGuard AI</h1>
+                <span>Disaster Intelligence Platform</span>
+            </div>
+        </div>
+
+        <nav class="nav">
+
+            <div class="nav-label">Main</div>
+
+            <button class="nav-item active">
+                <span class="nav-icon">⌂</span>
+                Dashboard
+            </button>
+
+            <button class="nav-item">
+                <span class="nav-icon">🗺️</span>
+                Risk Map
+            </button>
+
+            <button class="nav-item">
+                <span class="nav-icon">🔔</span>
+                Alerts
+            </button>
+
+            <button class="nav-item">
+                <span class="nav-icon">☁️</span>
+                Rainfall
+            </button>
+
+            <button class="nav-item">
+                <span class="nav-icon">🌊</span>
+                Inundation
+            </button>
+
+            <div class="nav-label" style="margin-top:20px;">Intelligence</div>
+
+            <button class="nav-item">
+                <span class="nav-icon">🧠</span>
+                Rainfall Intelligence
+            </button>
+
+            <button class="nav-item">
+                <span class="nav-icon">💧</span>
+                Inundation Intelligence
+            </button>
+
+            <button class="nav-item">
+                <span class="nav-icon">🎯</span>
+                Decision Intelligence
+            </button>
+
+            <div class="nav-label" style="margin-top:20px;">Response</div>
+
+            <button class="nav-item">
+                <span class="nav-icon">🛣️</span>
+                Safe Routes
+            </button>
+
+            <button class="nav-item">
+                <span class="nav-icon">🚨</span>
+                Emergency Center
+            </button>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="system-status">
+
+                <div class="status-row">
+                    <span>
+                        <span class="status-dot"></span>
+                        System status
+                    </span>
+
+                    <strong style="color:#86efac;">ONLINE</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================
+         MAIN CONTENT
+    ========================== -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+            <button
+                class="mobile-menu"
+                onclick="toggleSidebar()"
+                aria-label="Open menu"
+            >
+                ☰
+            </button>
+
+            <div class="location">
+
+                <div class="location-icon">
+                    📍
+                </div>
+
+                <div class="location-text">
+                    <small>MONITORING LOCATION</small>
+                    <strong>Kerala, India</strong>
+                </div>
+
+            </div>
+
+            <div class="header-actions">
+
+                <button
+                    class="icon-button"
+                    title="Notifications"
+                    onclick="showMessage('Notification center will be connected later.')"
+                >
+                    🔔
+                </button>
+
+                <button
+                    class="icon-button"
+                    title="Settings"
+                    onclick="showMessage('Settings module will be added later.')"
+                >
+                    ⚙️
+                </button>
+
+                <div class="user">
+
+                    <div class="avatar">
+                        AI
+                    </div>
+
+                    <div class="user-info">
+                        <strong>System Operator</strong>
+                        <small>Monitoring mode</small>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+
+        <section class="content">
+
+            <!-- WELCOME -->
+
+            <div class="welcome">
+
+                <div>
+                    <h2>Disaster Intelligence Dashboard</h2>
+
+                    <p>
+                        Monitor rainfall, predict inundation risk and receive
+                        intelligent emergency guidance.
+                    </p>
+                </div>
+
+                <div class="demo-badge">
+                    DEMO MODE • AI SYSTEM
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 KEY METRICS
+            ========================== -->
+
+            <div class="metrics">
+
+                <div class="metric">
+
+                    <div class="metric-top">
+
+                        <span class="metric-label">
+                            Rainfall Intensity
+                        </span>
+
+                        <div class="metric-icon">
+                            🌧️
+                        </div>
+
+                    </div>
+
+                    <div class="metric-value">
+                        74 mm
+                    </div>
+
+                    <div class="metric-footer">
+                        <span class="warning">↑ High</span>
+                        compared with normal levels
+                    </div>
+
+                </div>
+
+
+                <div class="metric">
+
+                    <div class="metric-top">
+
+                        <span class="metric-label">
+                            Flood Risk
+                        </span>
+
+                        <div class="metric-icon">
+                            🌊
+                        </div>
+
+                    </div>
+
+                    <div class="metric-value">
+                        68%
+                    </div>
+
+                    <div class="metric-footer">
+                        <span class="warning">Moderate–High</span>
+                        predicted risk
+                    </div>
+
+                </div>
+
+
+                <div class="metric">
+
+                    <div class="metric-top">
+
+                        <span class="metric-label">
+                            Active Alerts
+                        </span>
+
+                        <div class="metric-icon">
+                            🚨
+                        </div>
+
+                    </div>
+
+                    <div class="metric-value">
+                        07
+                    </div>
+
+                    <div class="metric-footer">
+                        <span class="up">● Live</span>
+                        alerts being monitored
+                    </div>
+
+                </div>
+
+
+                <div class="metric">
+
+                    <div class="metric-top">
+
+                        <span class="metric-label">
+                            Safe Route Score
+                        </span>
+
+                        <div class="metric-icon">
+                            🛣️
+                        </div>
+
+                    </div>
+
+                    <div class="metric-value">
+                        91%
+                    </div>
+
+                    <div class="metric-footer">
+                        <span class="up">Optimal</span>
+                        route currently available
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 THREE INTELLIGENCE ENGINES
+            ========================== -->
+
+            <div class="section-title">
+
+                <h3>Core Intelligence Engines</h3>
+
+                <span>
+                    3-layer AI decision architecture
+                </span>
+
+            </div>
+
+
+            <div class="intelligence-grid">
+
+                <!-- RAINFALL INTELLIGENCE -->
+
+                <div class="intel-card rainfall">
+
+                    <div class="intel-header">
+
+                        <div class="intel-icon">
+                            🌧️
+                        </div>
+
+                        <div class="intel-status">
+                            ACTIVE
+                        </div>
+
+                    </div>
+
+                    <h4>Rainfall Intelligence</h4>
+
+                    <p>
+                        Monitors rainfall conditions, detects abnormal
+                        precipitation and estimates upcoming heavy-rainfall
+                        probability.
+                    </p>
+
+                    <div class="intel-score">
+                        Confidence: <strong>87%</strong>
+                    </div>
+
+                    <div class="progress">
+                        <span style="width:87%;"></span>
+                    </div>
+
+                </div>
+
+
+                <!-- INUNDATION INTELLIGENCE -->
+
+                <div class="intel-card inundation">
+
+                    <div class="intel-header">
+
+                        <div class="intel-icon">
+                            🌊
+                        </div>
+
+                        <div class="intel-status">
+                            ACTIVE
+                        </div>
+
+                    </div>
+
+                    <h4>Inundation Intelligence</h4>
+
+                    <p>
+                        Estimates potential inundation, identifies vulnerable
+                        zones and evaluates flood risk across locations.
+                    </p>
+
+                    <div class="intel-score">
+                        Confidence: <strong>82%</strong>
+                    </div>
+
+                    <div class="progress">
+                        <span style="width:82%;"></span>
+                    </div>
+
+                </div>
+
+
+                <!-- DECISION INTELLIGENCE -->
+
+                <div class="intel-card decision">
+
+                    <div class="intel-header">
+
+                        <div class="intel-icon">
+                            🎯
+                        </div>
+
+                        <div class="intel-status">
+                            ACTIVE
+                        </div>
+
+                    </div>
+
+                    <h4>Decision Intelligence</h4>
+
+                    <p>
+                        Converts predicted risk into actionable warnings,
+                        safer routes and emergency response recommendations.
+                    </p>
+
+                    <div class="intel-score">
+                        Confidence: <strong>89%</strong>
+                    </div>
+
+                    <div class="progress">
+                        <span style="width:89%;"></span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 MAP + ALERTS
+            ========================== -->
+
+            <div class="dashboard-grid">
+
+                <!-- MAP -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h3>Live Risk Intelligence Map</h3>
+
+                        <span>
+                            GIS layer • Demo data
+                        </span>
+
+                    </div>
+
+                    <div class="map">
+
+                        <div class="map-river"></div>
+
+                        <div class="risk-zone risk-one"></div>
+                        <div class="risk-zone risk-two"></div>
+
+                        <div class="map-marker marker-one"></div>
+                        <div class="map-marker marker-two"></div>
+
+                        <div class="map-label label-one">
+                            High Risk Zone
+                        </div>
+
+                        <div class="map-label label-two">
+                            Flood-prone Area
+                        </div>
+
+                        <div class="map-overlay">
+                            <strong>Risk Layer</strong><br>
+                            🔴 High &nbsp; 🟠 Moderate &nbsp; 🟢 Low
+                        </div>
+
+                        <div class="map-controls">
+
+                            <button onclick="showMessage('Zoom in will connect to the GIS map.')">
+                                +
+                            </button>
+
+                            <button onclick="showMessage('Zoom out will connect to the GIS map.')">
+                                −
+                            </button>
+
+                            <button onclick="showMessage('Location service will be connected later.')">
+                                ◎
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- LIVE ALERTS -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h3>Live Alerts</h3>
+
+                        <span>
+                            07 active
+                        </span>
+
+                    </div>
+
+                    <div class="alerts">
+
+                        <div class="alert high">
+
+                            <div class="alert-icon">
+                                ⚠️
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    Heavy Rainfall Warning
+                                </strong>
+
+                                <p>
+                                    Intense rainfall conditions detected in
+                                    monitored region.
+                                </p>
+
+                                <time>
+                                    8 minutes ago
+                                </time>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="alert medium">
+
+                            <div class="alert-icon">
+                                🌊
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    Rising Inundation Risk
+                                </strong>
+
+                                <p>
+                                    Predicted water accumulation increasing
+                                    in vulnerable areas.
+                                </p>
+
+                                <time>
+                                    16 minutes ago
+                                </time>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="alert info">
+
+                            <div class="alert-icon">
+                                🛣️
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    Safe Route Updated
+                                </strong>
+
+                                <p>
+                                    Decision Intelligence generated a safer
+                                    alternative route.
+                                </p>
+
+                                <time>
+                                    24 minutes ago
+                                </time>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="alert medium">
+
+                            <div class="alert-icon">
+                                📡
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    Weather Data Update
+                                </strong>
+
+                                <p>
+                                    Latest weather observation received.
+                                </p>
+
+                                <time>
+                                    31 minutes ago
+                                </time>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 SAFE ROUTE + EMERGENCY
+            ========================== -->
+
+            <div class="lower-grid">
+
+                <!-- SAFE ROUTE -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h3>Safe Route Intelligence</h3>
+
+                        <span>
+                            Decision Intelligence
+                        </span>
+
+                    </div>
+
+                    <div class="route">
+
+                        <div class="route-score">
+
+                            <div>
+
+                                <div class="safe-score">
+                                    91%
+                                </div>
+
+                                <div class="safe-label">
+                                    Current route safety score
+                                </div>
+
+                            </div>
+
+                            <div style="font-size:25px;">
+                                🛣️
+                            </div>
+
+                        </div>
+
+
+                        <div class="route-line">
+
+                            <div class="route-point start">
+                                A
+                            </div>
+
+                            <div class="route-point mid">
+                                ✓
+                            </div>
+
+                            <div class="route-point end">
+                                B
+                            </div>
+
+                        </div>
+
+
+                        <div class="route-info">
+
+                            <div class="route-stat">
+                                <strong>8.4 km</strong>
+                                <span>Distance</span>
+                            </div>
+
+                            <div class="route-stat">
+                                <strong>17 min</strong>
+                                <span>Estimated time</span>
+                            </div>
+
+                            <div class="route-stat">
+                                <strong>Low</strong>
+                                <span>Flood risk</span>
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            class="route-button"
+                            onclick="showMessage('Interactive safe-route navigation will be connected during the GIS + Decision Intelligence phase.')"
+                        >
+                            View Recommended Route
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- EMERGENCY RESPONSE -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h3>Emergency Response Center</h3>
+
+                        <span>
+                            Quick access
+                        </span>
+
+                    </div>
+
+                    <div class="emergency">
+
+                        <div class="emergency-card">
+
+                            <div class="emergency-left">
+
+                                <div class="emergency-icon">
+                                    🚨
+                                </div>
+
+                                <div>
+                                    <strong>Emergency Services</strong>
+                                    <span>Emergency assistance</span>
+                                </div>
+
+                            </div>
+
+                            <button
+                                class="call-button"
+                                onclick="showMessage('Emergency contact integration will be added later.')"
+                            >
+                                CONTACT
+                            </button>
+
+                        </div>
+
+
+                        <div class="emergency-card">
+
+                            <div class="emergency-left">
+
+                                <div class="emergency-icon">
+                                    🏥
+                                </div>
+
+                                <div>
+                                    <strong>Medical Support</strong>
+                                    <span>Nearby medical facilities</span>
+                                </div>
+
+                            </div>
+
+                            <button
+                                class="call-button"
+                                onclick="showMessage('Nearby facility integration will be added later.')"
+                            >
+                                VIEW
+                            </button>
+
+                        </div>
+
+
+                        <div class="emergency-card">
+
+                            <div class="emergency-left">
+
+                                <div class="emergency-icon">
+                                    🏠
+                                </div>
+
+                                <div>
+                                    <strong>Emergency Shelters</strong>
+                                    <span>Safe shelter locations</span>
+                                </div>
+
+                            </div>
+
+                            <button
+                                class="call-button"
+                                onclick="showMessage('Shelter mapping will be connected to the GIS module.')"
+                            >
+                                VIEW
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 FEATURE MODULES
+            ========================== -->
+
+            <div class="section-title">
+
+                <h3>System Feature Modules</h3>
+
+                <span>
+                    Modular architecture for 37 planned capabilities
+                </span>
+
+            </div>
+
+
+            <div class="feature-grid">
+
+                <div class="feature">
+                    <div class="feature-icon">🌧️</div>
+                    <strong>Rainfall Monitoring</strong>
+                    <span>Monitor rainfall observations and trends.</span>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🔮</div>
+                    <strong>Rainfall Forecasting</strong>
+                    <span>Predict upcoming rainfall conditions.</span>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">⚠️</div>
+                    <strong>Heavy Rain Detection</strong>
+                    <span>Identify abnormal precipitation events.</span>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">📊</div>
+                    <strong>Risk Scoring</strong>
+                    <span>Convert environmental data into risk levels.</span>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🌊</div>
+                    <strong>Inundation Prediction</strong>
+                    <span>Estimate potential flood-prone locations.</span>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🗺️</div>
+                    <strong>GIS Risk Mapping</strong>
+                    <span>Visualize spatial disaster risk.</span>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🛣️</div>
+                    <strong>Road Risk Analysis</strong>
+                    <span>Identify roads affected by flooding.</span>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🚨</div>
+                    <strong>Early Warning</strong>
+                    <span>Generate prioritized warnings.</span>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">📱</div>
+                    <strong>Citizen Alerts</strong>
+                    <span>Provide actionable public notifications.</span>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🎯</div>
+                    <strong>Decision Support</strong>
+                    <span>Assist authorities during emergencies.</span>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🧠</div>
+                    <strong>AI Prediction Engine</strong>
+                    <span>Connect ML models to live predictions.</span>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">📈</div>
+                    <strong>Analytics</strong>
+                    <span>Analyze historical and predicted trends.</span>
+                </div>
+
+            </div>
+
+
+            <!-- FOOTER -->
+
+            <div class="footer">
+
+                RainGuard AI • AI/ML Based Heavy Rainfall Early Warning
+                and Inundation Prediction System • SIH 2026 Prototype
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script>
+
+    /* =========================
+       MOBILE SIDEBAR
+    ========================== */
+
+    function toggleSidebar() {
+
+        const sidebar = document.getElementById("sidebar");
+
+        sidebar.classList.toggle("open");
+
+    }
+
+
+    /* =========================
+       DEMO MESSAGE
+    ========================== */
+
+    function showMessage(message) {
+
+        alert(message);
+
+    }
+
+
+    /* =========================
+       NAVIGATION UI
+    ========================== */
+
+    const navItems = document.querySelectorAll(".nav-item");
+
+    navItems.forEach(item => {
+
+        item.addEventListener("click", () => {
+
+            navItems.forEach(nav => {
+                nav.classList.remove("active");
+            });
+
+            item.classList.add("active");
+
+        });
+
+    });
+
+
+    /* =========================
+       DEMO TIME UPDATE
+    ========================== */
+
+    console.log(
+        "RainGuard AI dashboard initialized successfully."
+    );
+
+    console.log(
+        "Current stage: Frontend foundation / Demo UI"
+    );
+
+    console.log(
+        "Real APIs, GIS, database and ML models will be integrated in later phases."
+    );
+
+</script>
+
+</body>
+</html>
